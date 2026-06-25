@@ -1,0 +1,5 @@
+LOAD seaweedfs.yaml
+LOAD seaweedfs-example.yaml
+LOAD seaweedfs-stack.yaml
+
+ENTRY seaweedfs/stack-local
