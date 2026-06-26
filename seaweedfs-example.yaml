@@ -1,0 +1,77 @@
+namespace: seaweedfs
+
+example:
+  defines: runnable
+  inherits: seaweedfs/base
+  metadata:
+    name: SeaweedFS Component Example
+    description: |
+      Local component demonstration inheriting the reusable SeaweedFS base. It uses
+      generated S3 credentials, creates an example bucket, and publishes localhost
+      ports for external smoke testing only.
+    tags: seaweedfs, s3, object-storage, component, example, local
+    website: https://seaweedfs.com/
+    source: https://github.com/seaweedfs/seaweedfs
+    publisher: monk.io
+    icon: https://raw.githubusercontent.com/seaweedfs/seaweedfs/master/note/seaweedfs.png
+    private: false
+  variables:
+    s3-access-key:
+      type: string
+      env: AWS_ACCESS_KEY_ID
+      value: <- random-uuid
+      description: Sensitive generated S3 access key for the component example.
+    s3-secret-key:
+      type: string
+      env: AWS_SECRET_ACCESS_KEY
+      value: <- random-uuid
+      description: Sensitive generated S3 secret key for the component example.
+    s3-bucket:
+      type: string
+      env: S3_BUCKET
+      value: monk-example
+      description: Example bucket SeaweedFS creates on startup for component verification.
+    data-volume-name:
+      type: string
+      value: seaweedfs-example
+      description: Monk volume subdirectory used for durable component example data.
+    master-host-port:
+      type: int
+      value: 19334
+      description: Non-privileged host port publishing the SeaweedFS master endpoint for local verification.
+    filer-host-port:
+      type: int
+      value: 18889
+      description: Non-privileged host port publishing the SeaweedFS filer endpoint for local verification.
+    s3-host-port:
+      type: int
+      value: 18334
+      description: Non-privileged host port publishing the S3 endpoint for local verification and dependent app testing.
+  services:
+    master:
+      container: seaweedfs
+      port: <- $master-port
+      protocol: tcp
+      publish: true
+      host-port: <- $master-host-port
+      description: Published local SeaweedFS master HTTP endpoint used for external smoke checks.
+    filer:
+      container: seaweedfs
+      port: <- $filer-port
+      protocol: tcp
+      publish: true
+      host-port: <- $filer-host-port
+      description: Published local SeaweedFS filer HTTP endpoint for component example clients.
+    s3:
+      container: seaweedfs
+      port: <- $s3-port
+      protocol: tcp
+      publish: true
+      host-port: <- $s3-host-port
+      description: Published local authenticated S3-compatible endpoint for component example clients.
+  checks:
+    readiness:
+      code: http-get-service("seaweedfs/example", "master", "/") get-member("status") 200 eq?
+      period: 10
+      initialDelay: 15
+      attempts: 30

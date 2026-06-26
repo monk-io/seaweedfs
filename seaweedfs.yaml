@@ -1,0 +1,107 @@
+namespace: seaweedfs
+
+base:
+  defines: runnable
+  metadata:
+    name: SeaweedFS S3 Component
+    description: |
+      Reusable SeaweedFS component providing a self-contained S3-compatible object
+      storage endpoint backed by SeaweedFS master, volume, filer, and S3 services in
+      one public chrislusf/seaweedfs container. SeaweedFS has no mandatory external
+      backing service for this default mode. Optional filer metadata stores can be
+      wired by inheriting templates when needed; compatible Monk packages include
+      self-hosted `postgresql/db`, MySQL, Redis, Cassandra, MongoDB, Elasticsearch,
+      Etcd, and CockroachDB packages.
+    tags: seaweedfs, s3, object-storage, distributed-storage, component
+    website: https://seaweedfs.com/
+    source: https://github.com/seaweedfs/seaweedfs
+    publisher: monk.io
+    icon: https://raw.githubusercontent.com/seaweedfs/seaweedfs/master/note/seaweedfs.png
+    private: false
+  variables:
+    image-tag:
+      type: string
+      value: latest
+      description: Public Docker Hub chrislusf/seaweedfs image tag to run.
+    seaweed-command:
+      type: string
+      value: mini -dir=/data
+      description: SeaweedFS command passed to the image entrypoint. The default starts master, volume, filer, S3, WebDAV, and admin services.
+    master-port:
+      type: int
+      value: 9333
+      description: SeaweedFS master HTTP port inside the container.
+    filer-port:
+      type: int
+      value: 8888
+      description: SeaweedFS filer HTTP port inside the container.
+    s3-port:
+      type: int
+      value: 8333
+      description: SeaweedFS S3-compatible API port inside the container.
+    webdav-port:
+      type: int
+      value: 7333
+      description: SeaweedFS WebDAV port inside the container.
+    admin-port:
+      type: int
+      value: 23646
+      description: SeaweedFS admin UI port inside the container.
+    s3-access-key:
+      type: string
+      env: AWS_ACCESS_KEY_ID
+      value: ""
+      description: Sensitive S3 access key. Inheriting secure templates must set this to a generated value or read it with secret("seaweedfs-s3-access-key") using a plain secret name.
+    s3-secret-key:
+      type: string
+      env: AWS_SECRET_ACCESS_KEY
+      value: ""
+      description: Sensitive S3 secret key. Inheriting secure templates must set this to a generated value or read it with secret("seaweedfs-s3-secret-key") using a plain secret name.
+    s3-bucket:
+      type: string
+      env: S3_BUCKET
+      value: ""
+      description: Optional comma-separated S3 bucket names SeaweedFS creates on startup. Leave empty to skip automatic bucket creation.
+    data-volume-name:
+      type: string
+      value: seaweedfs
+      description: Monk volume subdirectory used for durable SeaweedFS data.
+  containers:
+    seaweedfs:
+      image: chrislusf/seaweedfs
+      image-tag: <- $image-tag
+      restart: unless-stopped
+      command: <- $seaweed-command
+      paths:
+        - <- `${monk-volume-path}/${data-volume-name}:/data`
+  services:
+    master:
+      container: seaweedfs
+      port: <- $master-port
+      protocol: tcp
+      publish: false
+      description: Private SeaweedFS master HTTP API and status UI for Monk network health checks.
+    filer:
+      container: seaweedfs
+      port: <- $filer-port
+      protocol: tcp
+      publish: false
+      description: Private SeaweedFS filer HTTP endpoint used by S3 and file API clients on the Monk network.
+    s3:
+      container: seaweedfs
+      port: <- $s3-port
+      protocol: tcp
+      publish: false
+      description: Private S3-compatible object storage endpoint for dependent Monk workloads.
+    webdav:
+      container: seaweedfs
+      port: <- $webdav-port
+      protocol: tcp
+      publish: false
+      description: Private SeaweedFS WebDAV endpoint for Monk network clients.
+    admin:
+      container: seaweedfs
+      port: <- $admin-port
+      protocol: tcp
+      publish: false
+      description: Private SeaweedFS admin UI endpoint for Monk network operators.

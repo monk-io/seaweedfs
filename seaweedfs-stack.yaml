@@ -1,0 +1,166 @@
+namespace: seaweedfs
+
+stack:
+  defines: runnable
+  inherits: seaweedfs/base
+  metadata:
+    name: SeaweedFS Standalone Stack
+    description: |
+      Production-intended standalone SeaweedFS object storage stack using durable
+      storage and generated S3 credentials. Only the authenticated S3-compatible
+      API is exposed through Monk ingress; master, filer, WebDAV, and admin services
+      remain private on the Monk network.
+    tags: seaweedfs, s3, object-storage, distributed-storage, standalone, production
+    website: https://seaweedfs.com/
+    source: https://github.com/seaweedfs/seaweedfs
+    publisher: monk.io
+    icon: https://raw.githubusercontent.com/seaweedfs/seaweedfs/master/note/seaweedfs.png
+    private: false
+  variables:
+    s3-access-key:
+      type: string
+      env: AWS_ACCESS_KEY_ID
+      value: <- random-uuid
+      description: Sensitive generated S3 access key for the standalone stack. Inheriting production templates that need stable credentials should read secret("seaweedfs-s3-access-key") using a plain secret name.
+    s3-secret-key:
+      type: string
+      env: AWS_SECRET_ACCESS_KEY
+      value: <- random-uuid
+      description: Sensitive generated S3 secret key for the standalone stack. Inheriting production templates that need stable credentials should read secret("seaweedfs-s3-secret-key") using a plain secret name.
+    s3-bucket:
+      type: string
+      env: S3_BUCKET
+      value: seaweedfs
+      description: Default bucket SeaweedFS creates on startup for standalone object storage use.
+    data-volume-name:
+      type: string
+      value: seaweedfs-stack
+      description: Monk volume subdirectory used for durable standalone stack data.
+  services:
+    master:
+      container: seaweedfs
+      port: <- $master-port
+      protocol: tcp
+      publish: false
+      description: Private SeaweedFS master HTTP API and status UI for Monk network health checks.
+    filer:
+      container: seaweedfs
+      port: <- $filer-port
+      protocol: tcp
+      publish: false
+      description: Private SeaweedFS filer HTTP endpoint consumed by S3 inside the stack.
+    s3:
+      container: seaweedfs
+      port: <- $s3-port
+      protocol: tcp
+      publish: false
+      description: Authenticated S3-compatible object storage API exposed only through production Monk ingress.
+      ingress-routes:
+        default:
+          path-prefix: /
+    webdav:
+      container: seaweedfs
+      port: <- $webdav-port
+      protocol: tcp
+      publish: false
+      description: Private SeaweedFS WebDAV endpoint for trusted Monk network clients.
+    admin:
+      container: seaweedfs
+      port: <- $admin-port
+      protocol: tcp
+      publish: false
+      description: Private SeaweedFS admin UI endpoint for trusted Monk network operators.
+  checks:
+    readiness:
+      code: http-get-service("seaweedfs/stack", "master", "/") get-member("status") 200 eq?
+      period: 10
+      initialDelay: 15
+      attempts: 30
+
+stack-local:
+  defines: runnable
+  inherits: seaweedfs/stack
+  metadata:
+    name: SeaweedFS Standalone Local Stack
+    description: |
+      Local verification flavor for the standalone SeaweedFS stack. It keeps generated
+      S3 credentials, durable data, and publishes non-privileged localhost ports
+      because Monk ingress is not available on local targets.
+    tags: seaweedfs, s3, object-storage, distributed-storage, standalone, local
+    website: https://seaweedfs.com/
+    source: https://github.com/seaweedfs/seaweedfs
+    publisher: monk.io
+    icon: https://raw.githubusercontent.com/seaweedfs/seaweedfs/master/note/seaweedfs.png
+    private: false
+  variables:
+    s3-access-key:
+      type: string
+      env: AWS_ACCESS_KEY_ID
+      value: <- random-uuid
+      description: Sensitive generated S3 access key for the local standalone flavor.
+    s3-secret-key:
+      type: string
+      env: AWS_SECRET_ACCESS_KEY
+      value: <- random-uuid
+      description: Sensitive generated S3 secret key for the local standalone flavor.
+    s3-bucket:
+      type: string
+      env: S3_BUCKET
+      value: seaweedfs-local
+      description: Bucket SeaweedFS creates on startup for local standalone verification.
+    data-volume-name:
+      type: string
+      value: seaweedfs-stack-local
+      description: Monk volume subdirectory used for durable local standalone stack data.
+    master-host-port:
+      type: int
+      value: 19335
+      description: Non-privileged host port publishing the SeaweedFS master endpoint for local verification.
+    filer-host-port:
+      type: int
+      value: 18890
+      description: Non-privileged host port publishing the SeaweedFS filer endpoint for local verification.
+    s3-host-port:
+      type: int
+      value: 18335
+      description: Non-privileged host port publishing the authenticated S3 endpoint for local verification and clients.
+  services:
+    master:
+      container: seaweedfs
+      port: <- $master-port
+      protocol: tcp
+      publish: true
+      host-port: <- $master-host-port
+      description: Published local SeaweedFS master HTTP endpoint used for external smoke checks.
+    filer:
+      container: seaweedfs
+      port: <- $filer-port
+      protocol: tcp
+      publish: true
+      host-port: <- $filer-host-port
+      description: Published local SeaweedFS filer HTTP endpoint for standalone local clients.
+    s3:
+      container: seaweedfs
+      port: <- $s3-port
+      protocol: tcp
+      publish: true
+      host-port: <- $s3-host-port
+      description: Published local authenticated S3-compatible endpoint for standalone local clients.
+    webdav:
+      container: seaweedfs
+      port: <- $webdav-port
+      protocol: tcp
+      publish: false
+      description: Private SeaweedFS WebDAV endpoint kept on the Monk network in the local flavor.
+    admin:
+      container: seaweedfs
+      port: <- $admin-port
+      protocol: tcp
+      publish: false
+      description: Private SeaweedFS admin UI endpoint kept on the Monk network in the local flavor.
+  checks:
+    readiness:
+      code: http-get-service("seaweedfs/stack-local", "master", "/") get-member("status") 200 eq?
+      period: 10
+      initialDelay: 15
+      attempts: 30
