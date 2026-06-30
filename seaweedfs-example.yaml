@@ -31,10 +31,6 @@ example:
       env: S3_BUCKET
       value: monk-example
       description: Example bucket SeaweedFS creates on startup for component verification.
-    data-volume-name:
-      type: string
-      value: seaweedfs-example
-      description: Monk volume subdirectory used for durable component example data.
     master-host-port:
       type: int
       value: 19334
