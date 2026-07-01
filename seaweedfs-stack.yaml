@@ -121,21 +121,18 @@ stack-local:
       container: seaweedfs
       port: <- $master-port
       protocol: tcp
-      publish: true
       host-port: <- $master-host-port
       description: Published local SeaweedFS master HTTP endpoint used for external smoke checks.
     filer:
       container: seaweedfs
       port: <- $filer-port
       protocol: tcp
-      publish: true
       host-port: <- $filer-host-port
       description: Published local SeaweedFS filer HTTP endpoint for standalone local clients.
     s3:
       container: seaweedfs
       port: <- $s3-port
       protocol: tcp
-      publish: true
       host-port: <- $s3-host-port
       description: Published local authenticated S3-compatible endpoint for standalone local clients.
     webdav:
