@@ -121,6 +121,7 @@ stack-local:
       container: seaweedfs
       port: <- $master-port
       protocol: tcp
+      publish: true
       host-port: <- $master-host-port
       description: Published local SeaweedFS master HTTP endpoint used for external smoke checks.
     filer:
