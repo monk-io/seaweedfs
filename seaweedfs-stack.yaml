@@ -32,10 +32,6 @@ stack:
       env: S3_BUCKET
       value: seaweedfs
       description: Default bucket SeaweedFS creates on startup for standalone object storage use.
-    data-volume-name:
-      type: string
-      value: seaweedfs-stack
-      description: Monk volume subdirectory used for durable standalone stack data.
   services:
     master:
       container: seaweedfs
@@ -108,10 +104,6 @@ stack-local:
       env: S3_BUCKET
       value: seaweedfs-local
       description: Bucket SeaweedFS creates on startup for local standalone verification.
-    data-volume-name:
-      type: string
-      value: seaweedfs-stack-local
-      description: Monk volume subdirectory used for durable local standalone stack data.
     master-host-port:
       type: int
       value: 19335
@@ -136,14 +128,12 @@ stack-local:
       container: seaweedfs
       port: <- $filer-port
       protocol: tcp
-      publish: true
       host-port: <- $filer-host-port
       description: Published local SeaweedFS filer HTTP endpoint for standalone local clients.
     s3:
       container: seaweedfs
       port: <- $s3-port
       protocol: tcp
-      publish: true
       host-port: <- $s3-host-port
       description: Published local authenticated S3-compatible endpoint for standalone local clients.
     webdav:

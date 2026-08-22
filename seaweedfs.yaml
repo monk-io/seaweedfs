@@ -62,18 +62,18 @@ base:
       env: S3_BUCKET
       value: ""
       description: Optional comma-separated S3 bucket names SeaweedFS creates on startup. Leave empty to skip automatic bucket creation.
-    data-volume-name:
-      type: string
-      value: seaweedfs
-      description: Monk volume subdirectory used for durable SeaweedFS data.
   containers:
     seaweedfs:
       image: chrislusf/seaweedfs
       image-tag: <- $image-tag
       restart: unless-stopped
       command: <- $seaweed-command
-      paths:
-        - <- `${monk-volume-path}/${data-volume-name}:/data`
+      mounted-volumes:
+        data:
+          path: /data
+  volumes:
+    data:
+      kind: local
   services:
     master:
       container: seaweedfs

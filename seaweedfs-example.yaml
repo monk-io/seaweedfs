@@ -31,10 +31,6 @@ example:
       env: S3_BUCKET
       value: monk-example
       description: Example bucket SeaweedFS creates on startup for component verification.
-    data-volume-name:
-      type: string
-      value: seaweedfs-example
-      description: Monk volume subdirectory used for durable component example data.
     master-host-port:
       type: int
       value: 19334
@@ -59,14 +55,12 @@ example:
       container: seaweedfs
       port: <- $filer-port
       protocol: tcp
-      publish: true
       host-port: <- $filer-host-port
       description: Published local SeaweedFS filer HTTP endpoint for component example clients.
     s3:
       container: seaweedfs
       port: <- $s3-port
       protocol: tcp
-      publish: true
       host-port: <- $s3-host-port
       description: Published local authenticated S3-compatible endpoint for component example clients.
   checks:
