@@ -1,6 +1,6 @@
 module github.com/seaweedfs/seaweedfs/test/kafka
 
-go 1.25.0
+go 1.25.5
 
 require (
 	github.com/IBM/sarama v1.46.0
@@ -8,13 +8,13 @@ require (
 	github.com/seaweedfs/seaweedfs v0.0.0-00010101000000-000000000000
 	github.com/segmentio/kafka-go v0.4.49
 	github.com/stretchr/testify v1.11.1
-	google.golang.org/grpc v1.81.1
+	google.golang.org/grpc v1.83.1
 )
 
 replace github.com/seaweedfs/seaweedfs => ../../
 
 require (
-	github.com/andybalholm/brotli v1.2.0 // indirect
+	github.com/andybalholm/brotli v1.2.1 // indirect
 	github.com/aws/aws-sdk-go v1.55.8 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -47,7 +47,7 @@ require (
 	github.com/karlseguin/ccache/v2 v2.0.8 // indirect
 	github.com/klauspost/compress v1.18.6 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
-	github.com/klauspost/reedsolomon v1.14.0 // indirect
+	github.com/klauspost/reedsolomon v1.14.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20260216142805-b3301c5f2a88 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
@@ -69,13 +69,13 @@ require (
 	github.com/rdleal/intervalst v1.5.0 // indirect
 	github.com/sagikazarmark/locafero v0.11.0 // indirect
 	github.com/seaweedfs/goexif v1.0.3 // indirect
-	github.com/shirou/gopsutil/v4 v4.26.3 // indirect
+	github.com/shirou/gopsutil/v4 v4.26.5 // indirect
 	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/spf13/viper v1.21.0 // indirect
-	github.com/spiffe/go-spiffe/v2 v2.6.0 // indirect
+	github.com/spiffe/go-spiffe/v2 v2.7.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20190318030020-c3a204f8e965 // indirect
 	github.com/tklauser/go-sysconf v0.3.16 // indirect
@@ -96,7 +96,7 @@ require (
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260427160629-7cedc36a6bc4 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa // indirect
 	google.golang.org/grpc/security/advancedtls v1.0.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
